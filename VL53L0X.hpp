@@ -9,11 +9,25 @@
 #include <cstdint>
 #include <fstream>
 #include <mutex>
+#include <functional>
 
 #include "VL53L0X_defines.hpp"
 
 class VL53L0X {
 	public:
+
+		//////// MODIFIED SECTION
+
+		/*** I2C wrapper methods ***/
+		std::function<int8_t(uint8_t, uint8_t uint8_t*)> i2c_readByte;
+		std::function<int8_t(uint8_t, uint8_t uint8_t, uint8_t*)> i2c_readBytes;
+		std::function<bool(uint8_t, uint8_t, uint8_t)> i2c_writeByte;
+		std::function<bool(uint8_t, uint8_t, uint8_t, uint8_t*)> i2c_writeBytes;
+		std::function<bool(uint8_t, uint8_t, uint16_t)> i2c_writeWord;
+
+		//// END MODIFIED SECTION
+
+		
 		/*** Constructors and destructors ***/
 
 		/**
@@ -212,8 +226,6 @@ class VL53L0X {
 		 * Based on VL53L0X_perform_single_ref_calibration().
 		 */
 		bool performSingleRefCalibration(uint8_t vhvInitByte);
-
-		/*** I2C wrapper methods ***/
 
 		/**
 		 * Write an 8-bit register.

@@ -1,5 +1,4 @@
 #include "VL53L0X.hpp"
-#include "I2Cdev.hpp"
 
 // MODIFIED
 
@@ -872,10 +871,12 @@ bool VL53L0X::performSingleRefCalibration(uint8_t vhvInitByte) {
 	return true;
 }
 
+/////// MODIFIED SECTION
 /*** I2C wrapper methods ***/
 
 void VL53L0X::writeRegister(uint8_t reg, uint8_t value) {
-	bool p = I2Cdev::writeByte(this->address, reg, value);
+	//bool p = I2Cdev::writeByte(this->address, reg, value);
+	bool p = i2c_writeByte(this->address, reg, value);
 	if (!p) {
 		throw(std::runtime_error(std::string("Error writing byte to register: ") + strerror(errno)));
 	}
@@ -883,7 +884,8 @@ void VL53L0X::writeRegister(uint8_t reg, uint8_t value) {
 
 void VL53L0X::writeRegister16Bit(uint8_t reg, uint16_t value) {
 	// No need to reverse endinaness as writeWord does that for us
-	bool p = I2Cdev::writeWord(this->address, reg, value);
+	//bool p = I2Cdev::writeWord(this->address, reg, value);
+	bool p = i2c_writeWord(this->address, reg, value);
 	if (!p) {
 		throw(std::runtime_error(std::string("Error writing word to register: ") + strerror(errno)));
 	}
@@ -897,7 +899,8 @@ void VL53L0X::writeRegister32Bit(uint8_t reg, uint32_t value) {
 	data[2] = (value >> 16) & 0xFF;
 	data[3] = (value >> 24) & 0xFF;
 
-	bool p = I2Cdev::writeBytes(this->address, reg, 4, data);
+	//bool p = I2Cdev::writeBytes(this->address, reg, 4, data);
+	bool p = i2c_writeBytes(this->address, reg, 4, data);
 	if (!p) {
 		throw(std::runtime_error("Error writing dword to register"));
 	}
@@ -908,7 +911,8 @@ void VL53L0X::writeRegisterMultiple(uint8_t reg, const uint8_t* source, uint8_t 
 	for (uint8_t i = 0; i < 4; ++i) {
 		data[i] = source[i];
 	}
-	bool p = I2Cdev::writeBytes(this->address, reg, count, data);
+	//bool p = I2Cdev::writeBytes(this->address, reg, count, data);
+	bool p = i2c_writeBytes(this->address, reg, count, data);
 	if (!p) {
 		throw(std::runtime_error("Error writing block to register"));
 	}
@@ -916,7 +920,8 @@ void VL53L0X::writeRegisterMultiple(uint8_t reg, const uint8_t* source, uint8_t 
 
 uint8_t VL53L0X::readRegister(uint8_t reg) {
 	uint8_t data;
-	int8_t p = I2Cdev::readByte(this->address, reg, &data);
+	//int8_t p = I2Cdev::readByte(this->address, reg, &data);
+	int8_t p = i2c_readByte(this->address, reg, &data);
 	if (p == -1) {
 		throw(std::runtime_error("Error reading byte from register"));
 	}
@@ -926,7 +931,8 @@ uint8_t VL53L0X::readRegister(uint8_t reg) {
 uint16_t VL53L0X::readRegister16Bit(uint8_t reg) {
 	uint8_t data[2];
 	// TODO: change to readWord if implemented; remove reversing endianness afterwards
-	int8_t p = I2Cdev::readBytes(this->address, reg, 2, data);
+	//int8_t p = I2Cdev::readBytes(this->address, reg, 2, data);
+	int8_t p = i2c_readBytes(this->address, reg, 2, data);
 
 	if (p == -1) {
 		throw(std::runtime_error("Error reading word from register"));
@@ -939,7 +945,8 @@ uint16_t VL53L0X::readRegister16Bit(uint8_t reg) {
 uint32_t VL53L0X::readRegister32Bit(uint8_t reg) {
 	uint8_t data[4];
 	// TODO: change to readWords if implemented; remove reversing endianness afterwards
-	int8_t p = I2Cdev::readBytes(this->address, reg, 4, data);
+	//int8_t p = I2Cdev::readBytes(this->address, reg, 4, data);
+	int8_t p = i2c_readBytes(this->address, reg, 4, data);
 
 	if (p == -1) {
 		throw(std::runtime_error("Error reading dword from register"));
@@ -956,7 +963,8 @@ uint32_t VL53L0X::readRegister32Bit(uint8_t reg) {
 
 void VL53L0X::readRegisterMultiple(uint8_t reg, uint8_t* destination, uint8_t count) {
 	uint8_t data[count];
-	int8_t p = I2Cdev::readBytes(this->address, reg, count, data);
+	//int8_t p = I2Cdev::readBytes(this->address, reg, count, data);
+	int8_t p = i2c_readBytes(this->address, reg, count, data);
 
 	if (p == -1) {
 		throw(std::runtime_error("Error reading block from register"));
@@ -966,3 +974,5 @@ void VL53L0X::readRegisterMultiple(uint8_t reg, uint8_t* destination, uint8_t co
 		destination[i] = data[i];
 	}
 }
+
+//// END MODIFIED SECTION
